@@ -4,4 +4,4 @@ Audience statement: The blog post is written for river and catchment managers wi
 
 Generative AI declaration: I used Claude to help with code errors, and suggest CSS theming. I checked and revised all generated code and text.
 
-Website: https://devaansh-ops.github.io/etc5523-assignment-3-devaansh-ops/
+Website: https://etc5523-2026.github.io/etc5523-assignment-3-devaansh-ops/
