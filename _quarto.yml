@@ -1,17 +1,21 @@
 project:
   type: website
+  output-dir: docs
 
 website:
-  title: "blog-template"
+  title: "Devaansh Gupta"
+  description: "Data stories and analytics notes"
   navbar:
     right:
-      - about.qmd
+      - href: index.qmd
+        text: Posts
+      - href: about.qmd
+        text: About
       - icon: github
-        href: https://github.com/etc5523-2022
+        href: https://github.com/Devaansh-ops
+        aria-label: GitHub
+
 format:
   html:
-    theme: cosmo
-    css: styles.css
-
-
-
+    theme: [cosmo, styles.scss]
+    toc: true
