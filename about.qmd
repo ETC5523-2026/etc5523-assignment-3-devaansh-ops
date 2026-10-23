@@ -1,13 +1,35 @@
 ---
-title: "About"
+title: "Hi, I'm Devaansh"
 image: profile.jpg
 about:
   template: jolla
+  image-width: 14em
   links:
     - icon: github
-      text: Github
-      href: https://github.com/etc5523-2022
-
+      text: GitHub
+      href: https://github.com/Devaansh-ops
+    - icon: instagram
+      text: Instagram
+      href: https://www.instagram.com/devaansh_1102
+    - icon: envelope
+      text: Email
+      href: mailto:dgup0007@student.monash.edu
 ---
 
-This is a blog template for the ETC5523 Communicating with Data assessment at Monash University.
+I'm a Master of Business Analytics student at Monash University. I came into it from a business background with no coding experience, so every chart and line of R on this site is something I had to learn the slow way. I like that, because it means I remember how confusing data can feel when nobody explains it properly.
+
+## What I care about
+
+Most people who make decisions with data are not statisticians, and they shouldn't have to be. I enjoy the part of analytics where a technical result turns into something a team can act on. A clear chart or a plain sentence often does more than a clever model.
+
+## Life away from the screen
+
+Hiking is a big part of my week. I like getting out on a trail and letting my head clear, and some of my best ideas show up halfway up a hill.
+
+When I'm not outdoors, you'll find me on a badminton court or playing video games. Badminton keeps me moving, and games keep me strategising, which is oddly close to how I think about data problems.
+
+I also love to sing. I'm what you'd call a closeted singer, so the shower and the car are my main venues. This site is the closest you'll get to a performance.
+
+## My first post
+
+I wrote it for people who plan river monitoring budgets. It asks whether cheap sensors can tell us enough about nitrate that an agency doesn't need an expensive sensor at every site. You can read it on the [Posts](index.qmd) page.

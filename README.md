@@ -1,6 +1,7 @@
+# Devaansh Gupta personal website
 
-# ETC5523 Blog Assessment
+Audience statement: The blog post is written for river and catchment managers with no statistics background who decide what to monitor and need to understand what sensor data can and cannot tell them.
 
-* This is a **template** for the ETC5523 Blog Assessment. 
-* The author of this blog is **Michael Lydeamore**.
-* The URL for this blog is [https://etc5523-2023.github.io/blog-template/](https://etc5523-2023.github.io/blog-template/)
+Generative AI declaration: I used Claude to help with code errors, and suggest CSS theming. I checked and revised all generated code and text.
+
+Website: https://etc5523-2026.github.io/etc5523-assignment-3-devaansh-ops/

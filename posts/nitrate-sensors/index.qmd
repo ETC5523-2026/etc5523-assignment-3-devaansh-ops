@@ -1,0 +1,363 @@
+---
+title: "What drives nitrate in a river? Clues from three very different streams"
+description: "A plain-language guide to what makes nitrate rise and fall in rivers, and a six-step plan for the people who look after them."
+author: "Devaansh Gupta"
+date: "2026-10-23"
+categories: [water quality, modelling, monitoring]
+bibliography: references.bib
+toc-location: left
+toc-title: "In this post"
+reference-location: margin
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+## The problem
+
+Imagine a storm hits a farming region at 2 am. By dawn the river has turned brown, and for a few hours the amount of nitrate in the water shoots up before falling back. Now imagine the one nitrate sensor on that river stopped recording at midnight because its lens got dirty. The biggest spike of the month happened, and nobody has a number for it.
+
+That matters because nitrate is one of the most closely watched substances in a river. It is a form of nitrogen that dissolves in water[^1], and it comes from fertiliser, sewage and animal waste. A little is normal. Too much feeds huge amounts of algae. When the algae die and rot, they use up the oxygen in the water, and fish and insects struggle to breathe. Rivers also feed many water supplies, and in drinking water nitrate is a health risk, especially for babies under six months. That is why the US Environmental Protection Agency caps it at 10 milligrams per litre (measured as nitrogen) in public supplies.
+
+[^1]: Nitrate is made of one nitrogen atom and three oxygen atoms. Plants need nitrogen to grow, which is why fertiliser contains it.
+
+So managers want to watch nitrate closely, but they are squeezed from three sides. Nitrate sensors are expensive, so most rivers only get a few. The sensors also fail, because in-water sensors are prone to technical errors that leave gaps in the record [@kermorvant2021]. And budgets are limited, so someone has to decide which rivers get a nitrate sensor and what to do when one breaks. Cheaper sensors that measure simple things, like how warm the water is or how muddy it looks, are far more common. A team of researchers asked whether those cheaper readings could act as clues that help explain what nitrate is doing.
+
+This post follows their work and answers three questions along the way:
+
+1.  Which cheap clues move together with nitrate?
+2.  Does the same recipe work in every river?
+3.  What should a manager actually do with this, starting next week?
+
+::: callout-note
+## The short version
+
+Six simple clues let the researchers follow about three quarters or more of nitrate's rises and falls. Adding what nitrate had been doing a moment earlier took that to about 99%. But each river had a different most useful clue, so every river needs its own model. The research points to a careful pilot at a river that already has a nitrate sensor, not to switching nitrate sensors off.
+:::
+
+## Where the evidence comes from
+
+The main study was written by @kermorvant2023 and published in the journal PLOS ONE, where other scientists review work before it is printed. The team used open data from the National Ecological Observatory Network (NEON) in the United States [@neon]. Sensors in three rivers took a reading every 15 minutes for about two years, which gave roughly 70,000 readings per river. The rivers were chosen because they are so different, which makes it a fair test of whether a finding holds up. @fig-hook shows just how different, even before we look at any clues.
+
+```{r}
+#| label: fig-hook
+#| fig-cap: "Typical nitrate level at each study river (the middle value, in micromoles per litre). Data from Kermorvant et al. (2023)."
+#| fig-alt: "Bar chart of typical nitrate at three rivers. Arikaree 5.5, Caribou 28.4, Lewis Run 192 micromoles per litre. A note says Lewis Run has about 35 times more nitrate than Arikaree."
+#| fig-width: 7.5
+#| fig-height: 4.3
+library(tidyverse)
+library(knitr)
+
+hook_rivers <- c("Arikaree\n(dry grassland)", "Caribou\n(cold forest)", "Lewis Run\n(city and farm)")
+hook <- tibble(
+  river = factor(hook_rivers, levels = hook_rivers),
+  nitrate = c(5.5, 28.4, 192)
+)
+
+ggplot(hook, aes(river, nitrate, fill = river)) +
+  geom_col(width = 0.6, show.legend = FALSE) +
+  geom_text(aes(label = paste0(nitrate, " µM")),
+            vjust = -0.5, size = 4.4, colour = "#1F2D3D", fontface = "bold") +
+  annotate("text", x = 2, y = 150,
+           label = "Lewis Run has about 35 times\nmore nitrate than Arikaree",
+           size = 4.2, colour = "#1F2D3D") +
+  scale_fill_manual(values = c("#B9D7C8", "#7FA6C4", "#2F6690")) +
+  scale_y_continuous(limits = c(0, 220), breaks = seq(0, 200, 50)) +
+  labs(x = NULL, y = "Typical nitrate level (µM)") +
+  theme_minimal(base_size = 13) +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill = "#F8F6F1", colour = NA))
+```
+
+The unit on the chart is µM[^2]. @tbl-rivers adds what surrounds each river and how well the clues did, which we will unpack shortly.
+
+[^2]: µM means micromoles per litre, a way of counting how many nitrate molecules are in a litre of water. You only need to compare the three numbers with each other.
+
+::::::: stat-row
+::: stat
+[3]{.num}[very different rivers]{.lab}
+:::
+
+::: stat
+[70,000]{.num}[sensor readings per river]{.lab}
+:::
+
+::: stat
+[75-85%]{.num}[followed using the clues alone]{.lab}
+:::
+
+::: stat
+[99%]{.num}[once the recent pattern is added]{.lab}
+:::
+:::::::
+
+```{r}
+#| label: tbl-rivers
+#| tbl-cap: "The three study rivers. Adapted from Kermorvant et al. (2023)."
+tibble(
+  River = c("Arikaree (Colorado)", "Caribou (Alaska)", "Lewis Run (Virginia)"),
+  Setting = c("Semi-arid grassland and farming",
+              "Subarctic forest, minimal human disturbance",
+              "Temperate climate, city and farm influence"),
+  `Typical nitrate (µM)` = c("5.5", "28.4", "192"),
+  `Score using the clues alone` = c("75%", "83%", "85%"),
+  `Most useful clue` = c("None stands out", "Conductivity", "Season")
+) |>
+  kable()
+```
+
+## Meet the six clues
+
+You don't need a science background for these. @tbl-clues explains each clue in plain words and gives a sensible reason it could be linked to nitrate. I will keep using these names for the rest of the post.
+
+```{r}
+#| label: tbl-clues
+#| tbl-cap: "The six clues used to explain nitrate, in plain words, with a possible reason each one could be linked to nitrate."
+tibble(
+  Clue = c("Season (time of year)", "Water temperature", "Water level",
+           "Conductivity", "Cloudiness (turbidity)", "Dissolved oxygen"),
+  `What it means` = c(
+    "Where we are in the year. The model uses the date to pick up yearly rhythms.",
+    "How warm or cold the river water is.",
+    "How high the river is. It rises after rain or snowmelt.",
+    "How easily electricity passes through the water. Pure water barely carries any, but dissolved salts and minerals help it along. A higher reading means more dissolved material.",
+    "How murky the water is. Mud, silt and tiny particles scatter light, so a turbidity sensor shines a light through the water and measures how much gets scattered. After a storm, the reading jumps.",
+    "The amount of oxygen mixed into the water, which fish and insects need to breathe."
+  ),
+  `Why it could be a clue` = c(
+    "Farming and weather follow the calendar, such as fertiliser spreading and snowmelt.",
+    "Warmer water speeds up life in the river, including the algae and bacteria that use and make nitrogen.",
+    "Rain and snowmelt wash nitrate in from the land, or dilute it.",
+    "Fertiliser and other runoff dissolve in water, so they can rise together.",
+    "Storms stir up mud and also wash in whatever is sitting on the land.",
+    "Algae make oxygen by day and use it at night, and they take up nitrate as they grow."
+  )
+) |>
+  kable()
+```
+
+## What the researchers did
+
+Think of it as detective work. The researchers gave a computer model the six clues and asked it to work out how nitrate was rising and falling. They did it in three steps:
+
+1.  **Draw flexible curves.** For each clue, the model finds how nitrate tends to change when that clue changes. The links are often curved, not straight lines, so the model is allowed to bend.
+2.  **Add the recent pattern.** Nitrate right now is closely related to nitrate a moment ago. If it was 20 at 10:00, it is very unlikely to be 5 at 10:15. The model uses this idea to pick up what the clues miss.
+3.  **Take clues away one at a time.** To find out which clue mattered most, they removed each one and checked how much worse the model got. A bigger drop means a more important clue.
+
+Next comes the number that confuses most people, the "75%". Before you see any real results, @fig-wiggle explains it with a made-up example, so you have a benchmark for what a good score looks like.
+
+```{r}
+#| label: fig-wiggle
+#| fig-cap: "A made-up example to show what 'explained' means. The grey line is pretend nitrate readings. The dashed line is a lazy guess that always says 'average'. The blue line is a model that follows the pattern."
+#| fig-alt: "Line chart of invented nitrate readings over 90 days that rise and fall. A flat dashed line shows the average. A smooth blue line follows the rises and falls closely."
+#| fig-width: 7.5
+#| fig-height: 4
+set.seed(12)
+days <- 1:90
+true_curve <- 20 + 6 * sin(days / 90 * 2 * pi * 1.5)
+toy <- tibble(
+  day = days,
+  nitrate = true_curve + rnorm(90, 0, 1.6),
+  model = true_curve
+)
+toy$flat <- mean(toy$nitrate)
+
+toy_score <- 1 - sum((toy$nitrate - toy$model)^2) / sum((toy$nitrate - toy$flat)^2)
+
+toy_long <- toy |>
+  pivot_longer(c(nitrate, flat, model), names_to = "series", values_to = "value") |>
+  mutate(series = factor(series,
+                         levels = c("nitrate", "flat", "model"),
+                         labels = c("Pretend nitrate readings",
+                                    "Lazy guess: always the average",
+                                    "Model's guess")))
+
+ggplot(toy_long, aes(day, value, colour = series, linetype = series, linewidth = series)) +
+  geom_line() +
+  scale_colour_manual(values = c("#9AA6B2", "#B8955A", "#2F6690")) +
+  scale_linetype_manual(values = c("solid", "dashed", "solid")) +
+  scale_linewidth_manual(values = c(0.6, 0.9, 1.3)) +
+  labs(x = "Days", y = "Nitrate level (made-up units)",
+       colour = NULL, linetype = NULL, linewidth = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill = "#F8F6F1", colour = NA))
+```
+
+::: callout-note
+## What does "75% explained" mean, and how is it worked out?
+
+Imagine you had to guess nitrate for every 15 minutes. The laziest guess is the average level every time. That guess is wrong whenever the real level swings up or down, which is the dashed line in @fig-wiggle. The model's guess is closer, which is the blue line.
+
+The score measures how much of the lazy guess's error disappears. In rough terms, it is 100% minus the model's error as a share of the lazy guess's error. If the lazy guess is off by 100 points in total and the model is off by 25, the score is 75%.
+
+A score of 0% means the model is no better than guessing the average. A score of 100% means it follows every wiggle. In the made-up example above, the model scores about `r sprintf("%.0f", toy_score * 100)`%.
+:::
+
+## What they found
+
+Start with the first question, about which clues move together with nitrate. @fig-score shows how well the model followed the real nitrate readings at each river. Using the six clues alone, it scored 75% at Arikaree, 83% at Caribou and 85% at Lewis Run. Adding the recent pattern step took every river to about 99%. The authors put it this way in their abstract:
+
+> Total deviance explained by the models was high for all sites (99%).
+
+That is the study's own wording [@kermorvant2023], and "deviance explained" is the same score out of 100 we just practised. All six clues made a real difference at every river[^3], so none could be dropped without losing something.
+
+[^3]: Here "real" means the link was too consistent to be a fluke.
+
+```{r}
+#| label: fig-score
+#| fig-cap: "How closely the model follows nitrate, as a score out of 100, at each river. Data from Kermorvant et al. (2023)."
+#| fig-alt: "Grouped bar chart. For Arikaree, Caribou and Lewis Run, the six clues alone score 75, 83 and 85. Adding what nitrate was doing a moment ago takes each river to 99."
+#| fig-width: 7.5
+#| fig-height: 4.5
+rivers <- c("Arikaree\n(dry grassland)", "Caribou\n(cold forest)", "Lewis Run\n(city and farm)")
+
+score <- tibble(
+  river = factor(rep(rivers, each = 2), levels = rivers),
+  step = factor(rep(c("Six clues alone", "Six clues plus the recent pattern"), 3),
+                levels = c("Six clues alone", "Six clues plus the recent pattern")),
+  value = c(75, 99, 83, 99, 85, 99)
+)
+
+ggplot(score, aes(river, value, fill = step)) +
+  geom_col(position = position_dodge(width = 0.75), width = 0.65) +
+  geom_text(aes(label = paste0(value, "%")),
+            position = position_dodge(width = 0.75),
+            vjust = -0.5, size = 4.2, colour = "#1F2D3D") +
+  scale_fill_manual(values = c("#B9D7C8", "#2F6690")) +
+  scale_y_continuous(limits = c(0, 110), breaks = seq(0, 100, 25)) +
+  labs(x = NULL, y = "Score out of 100", fill = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill = "#F8F6F1", colour = NA))
+```
+
+::: callout-tip
+## Midway summary
+
+So far we know the six clues can follow most of nitrate's rises and falls. The surprising part is next. The same toolkit works in a desert river and an Arctic one, but the winning clue changes from river to river.
+:::
+
+## The surprise: same toolkit, different winner
+
+The second question is where it gets interesting. Think of the six clues as six witnesses. In every river all six had something to say, but a different witness was the most useful each time. @fig-drivers shows this. Each bar is roughly how many points the score drops when that clue is taken away, so a longer bar means a more important clue. The dark bar marks the most important clue in each river.
+
+```{r}
+#| label: fig-drivers
+#| fig-cap: "How important each clue was at each river. A longer bar means the model got worse by more when that clue was removed. Approximate values read from Figure 4 of Kermorvant et al. (2023)."
+#| fig-alt: "Bar chart with three panels, one per river, showing six clues. At Arikaree every clue is under 5 percent. At Caribou conductivity stands out at about 10 percent. At Lewis Run every clue is between about 11 and 16 percent, with season highest."
+#| fig-width: 9
+#| fig-height: 4.6
+clues <- c("Season", "Temperature", "Water level", "Conductivity", "Cloudiness", "Oxygen")
+panels <- c("Arikaree (dry grassland)\nno clue stands out",
+            "Caribou (cold forest)\nconductivity stands out",
+            "Lewis Run (city and farm)\nevery clue matters")
+
+imp <- tibble(
+  river = factor(rep(panels, each = 6), levels = panels),
+  clue = factor(rep(clues, 3), levels = rev(clues)),
+  share = c(4.2, 4.6, 3.4, 3.3, 3.5, 3.3,
+            5.8, 5.6, 4.9, 10.0, 1.7, 5.7,
+            16.4, 11.2, 12.9, 12.9, 12.1, 11.5)
+) |>
+  group_by(river) |>
+  mutate(top = share == max(share)) |>
+  ungroup()
+
+ggplot(imp, aes(share, clue, fill = top)) +
+  geom_col(width = 0.65, show.legend = FALSE) +
+  geom_text(aes(label = sprintf("%.1f", share)),
+            hjust = -0.15, size = 3.6, colour = "#1F2D3D") +
+  facet_wrap(~river, nrow = 1) +
+  scale_fill_manual(values = c("TRUE" = "#2F6690", "FALSE" = "#B9D7C8")) +
+  scale_x_continuous(limits = c(0, 20), breaks = seq(0, 20, 5)) +
+  labs(x = "How important the clue was (higher means more important)", y = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(strip.text = element_text(face = "bold", colour = "#1F2D3D"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        plot.background = element_rect(fill = "#F8F6F1", colour = NA))
+```
+
+Arikaree, the dry grassland river in Colorado, was the quiet one. No clue was important on its own, and temperature was only slightly ahead. The clues together still scored 75%, and the recent pattern covered most of what was left. Caribou, the cold forest river in Alaska, had one clear standout. Conductivity, the clue that tells us about dissolved salts, was well ahead of the next best, while cloudiness barely registered. That river has minimal human disturbance. Lewis Run in Virginia was the opposite of quiet. It sits near a city and farmland, it had by far the most nitrate, and every clue mattered, with the season clue highest.
+
+The shape of the links differed between rivers too. At low conductivity, nitrate tended to rise as conductivity rose at Arikaree, but it fell at Lewis Run. Water level showed a similar split, with nitrate tending to rise as the water rose at Caribou, while Lewis Run showed the opposite for most of the range. This is why the authors concluded that local settings still matter. The same toolkit works in every river, but each river needs its own model.
+
+## Can the clues rescue a broken sensor?
+
+This is where the research starts to look practical. Remember the sensor that went dark at midnight. The same team tested exactly that situation in a second study [@kermorvant2021]. They took two years of real nitrate data from Arikaree and deleted pieces of it on purpose, single readings, then whole days and weeks. Then they asked the model to refill the gaps using the other clues.
+
+For single missing readings, the model's guess landed within the nitrate sensor's own precision 72% of the time. It got worse when whole stretches of data were missing. How well it worked also depended on whether the other clues were available at that moment. When they were, even a sudden, event-driven peak in nitrate was rebuilt well. In other words, the clues can help patch short holes in a nitrate record[^4], which matters most when the hole covers the event you care about.
+
+[^4]: These holes often come from biofouling, which is slime, algae and tiny animals growing on a sensor and blocking its view.
+
+## What a manager should do next
+
+That brings us to the third question. The research was designed to help people understand nitrate, not to replace nitrate sensors, so the plan below stays close to what was tested. @tbl-steps lays it out as six steps. Some of the "why" notes are my own reading of the findings, so treat them as sensible suggestions and not as results from the studies.
+
+```{r}
+#| label: tbl-steps
+#| tbl-cap: "A six-step pilot plan for a manager who wants to try this approach."
+tibble(
+  Step = c("1. Pick one pilot river",
+           "2. Check all six clues are recorded",
+           "3. Ask a statistician to fit that river's own model",
+           "4. Ask for three things back",
+           "5. Run a hide-and-check test",
+           "6. Decide, then repeat"),
+  `What to do` = c(
+    "Choose a river that already has a working nitrate sensor, sensors for the six clues, and about two years of readings every 15 minutes.",
+    "Make sure the six clues are recorded at the same times as nitrate. Fix any missing sensor first.",
+    "Ask for flexible curves plus the recent pattern step. Budget extra time, because the study's authors had to hand-code parts of the modelling.",
+    "(a) The score out of 100 using the clues alone. (b) A chart like Figure 4 showing which clue matters most. (c) A plain list of the results.",
+    "Hide some real nitrate readings, such as single readings, then a day, then a week, and see how close the model's guesses are.",
+    "If the test goes well, use the model to patch short gaps and label those values as estimates. Then repeat steps 1 to 5 at a second river."
+  ),
+  `Why it matters` = c(
+    "The model learns from real nitrate readings. The study had about 70,000 per river, so a few weeks of data is not enough.",
+    "Every clue earned its place at every river in the study, so dropping one costs you accuracy.",
+    "The study found no single model worked across rivers, and standard tools struggled with this much data.",
+    "A score near the study's 75% to 85% suggests the clues carry most of the story at your river. A much lower score suggests something you are not measuring is driving nitrate, so look for it. The clue that matters most is the sensor you can least afford to lose, so keep it clean and calibrated.",
+    "The 2021 team used this same trick at Arikaree. It tells you how far to trust the model before your real sensor breaks.",
+    "The research never tested a river with no nitrate sensor at all, so that step needs its own proof at each river."
+  )
+) |>
+  kable()
+```
+
+A few things the research does not support. Do not remove a nitrate sensor because of this work alone. Do not copy a model from one river to another. Do not treat gaps filled by the model as measured values, and always label them as estimates. And do not read "99%" as proof you can do without nitrate readings, because that score includes the recent pattern step, which only works from readings that were actually recorded.
+
+Two limits are worth keeping in mind. The main study covers only three rivers and about two years of data, so it is too early to say how well the pattern holds in other places or unusual years. The gap-filling test also came from a single river, so it needs repeating before anyone relies on it widely.
+
+## Conclusion
+
+Back to the storm and the sensor that went dark at midnight. The research gives a manager a realistic answer. Six simple clues explained between 75% and 85% of nitrate's rises and falls in three very different rivers, and the recent pattern took that to about 99%. The same clues mattered everywhere, but which clue mattered most changed from river to river, so each river needs its own model. The follow-up study shows those clues can patch short gaps in a nitrate record, which is exactly the problem that opens this post. So the sensible move is a careful pilot at a river that already has a nitrate sensor. Fit its own model, test it by hiding real readings, and only then lean on it. Used that way, cheap clues can protect the nitrate record you already pay for, and they might eventually help decide where the next nitrate sensor is worth buying.
+
+::: {.callout-tip collapse="true"}
+## Behind the post: how this differs from the journal paper
+
+The paper this post is based on and this post cover the same evidence, but they do different jobs. The paper is a stand-alone, archival piece that other scientists can check and reuse. This post is meant to help a busy manager decide what to do, so it focuses on relevance, why it matters, actions and limits.
+
+|   | Journal paper | This post |
+|------------------------|------------------------|------------------------|
+| Who it is for | Other scientists, who will check and reuse the method | River managers, who need to decide what to do |
+| Order | Builds slowly through methods, results and discussion | Answer first, then the evidence, then the plan |
+| Language | Technical terms such as deviance and mixed models | Plain words and a made-up example to explain scores |
+| Visuals | Several figures and tables, including raw sensor data | Four charts, each answering one question |
+| Limits | Listed in the discussion section | Tied to the next step so the reader knows what to do |
+| Goal | Complete, defensible and permanent | Clear, easy to act on and honest about limits |
+
+I borrowed three ideas from pieces I studied earlier. A story opening makes a dry topic easier to care about. Background comes before numbers so readers can judge them. And in a data story the headline result goes early, so people keep reading.
+
+On the charts, each one carries a single message. Soft colours keep the page calm, and the darker bar or line always marks the thing to look at first.
+:::
+
+## References
+
+::: {#refs}
+:::
